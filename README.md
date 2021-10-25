@@ -40,7 +40,7 @@ Bài viết này được lấy từ trang chủ của flask: https://flask.pall
 ### 1. Lời giới thiệu
 Theo mức độ phổ biến, các ứng dụng Web trên nền tảng Django nhiều hơn là Flask. Tuy vậy, điều đó không đưa đến kết luận là Django tốt hơn Flask. Nếu muốn xây dựng một ứng dụng với thời gian ngắn nhất, Django dĩ nhiên là một lựa chọn tốt. Nhưng xét về tính linh hoạt, Django lại không bằng Flask. Với Django, các thành phần cơ bản của ứng dụng đã được định nghĩa sẵn, vì vậy khó tùy biến hơn. Ngược lại, Flask cho phép người lập trình lựa chọn và ghép nối các thành phần theo ý mình. Vì vậy, Flask là lựa chọn tốt cho những ai muốn tìm hiểu sâu về các Web framework và muốn có mức độ tùy biến cao.
 
-Flask không như Django, khi bạn khởi tạo một project từ Django, nó sẽ tạo cho bạn một cây thư mục sẵn và tối ưu nhất bao gồm các folders static, templates, các files routes, models,... Tuy nhiên Flask không như thế, bạn phải tạo ra tất cả các folders cũng như các files theo ý của bạn, đó vừa là cái ưu điểm vừa là cái nhược điểm. Điều này khiến cho các bạn mới bắt đầu với Flask khá hoang mang khi không biết đâu là một cây thư mục tối ưu nhất. Mình là một người đang tự học và tìm hiểu về Flask cũng đang bị như vậy, trước khi làm bài này mình đã tham khảo hàng tá bài viết về Flask trên internet, mỗi bài tạo một tên files khác nhau, một vị trí khác nhau khiến mình càng xem càng không hiểu. Mình quyết định tham khảo trực tiếp trên trang chủ của Flask và làm theo từng bước của nó đồng thời vietsub ra cho các bạn cùng đồng hành với mình(Xài gg dịch nhé).
+Flask không như Django, khi bạn khởi tạo một project từ Django, nó sẽ tạo cho bạn một cấu trúc ứng dụng hoàn chỉnh và tối ưu nhất bao gồm các folders static, templates, các files routes, models,... Tuy nhiên Flask không như thế, bạn phải tạo ra tất cả các folders cũng như các files theo ý của bạn, đó vừa là ưu điểm vừa là nhược điểm. Điều này khiến cho các bạn mới bắt đầu với Flask khá hoang mang khi không biết đâu là một cấu trúc tốt nhất. Mình là một người đang tự học và tìm hiểu về Flask cũng đang bị như vậy, trước khi làm bài này mình đã tham khảo hàng tá bài viết về Flask trên internet, mỗi bài tạo một tên files khác nhau, một vị trí khác nhau khiến mình càng xem càng không hiểu. Mình quyết định tham khảo trực tiếp trên trang chủ của Flask và làm theo từng bước của nó đồng thời vietsub ra cho các bạn cùng đồng hành với mình(Xài gg dịch nhé).
 <a name="Kienthuccanchuanbi"></a>
 ### 2. Kiến thức cần chuẩn bị
 Để bắt đầu lập trình backend một cách thuận lợi nhất, chúng ta cẩn chuẩn bị cho mình các kiến thức cơ bản:
@@ -50,20 +50,20 @@ Flask không như Django, khi bạn khởi tạo một project từ Django, nó 
 - Mô hình MVC, WSGI, Jinja, SQL, Virtual environment.
 <a name="Caidat"></a>
 ## II. Cài đặt
-Phần này chúng ta sẽ sử dụng luôn phần "hướng dẫn tạo dự án đầu tiên" trong mục IV.
+Phần này chúng ta sẽ sử dụng luôn phần IV.
 <a name="Batdaunhanh"></a>
 ## III. Bắt đầu nhanh
 <a name="Huongdan"></a>
 Phần này Flask hướng dẫn sử dụng các thành phần chính khi xây dựng ứng dụng.
 Các bạn có thể xem trực tiếp trên trang chủ Flask.
 ## IV. Hướng dẫn
-Trong phần hướng dẫn này mình sử dụng HDH Windows 10 và Visual Studio Code(1.61.2)
+Trong hướng dẫn này mình sử dụng HDH Windows 10 và Visual Studio Code(1.61.2)
 <a name="Bocucduan"></a>
 ### 1. Bố cục dự án
 #### Đầu tiên hãy cài đặt Python nhé: 
 https://www.python.org/downloads/
 
-Phiên bản python mình sử dụng để làm phần này: Python 3.9.7
+Phiên bản python mình sử dụng: Python 3.9.7
 
 #### Khởi tạo thư mục chính:
 ```
@@ -75,17 +75,17 @@ Tiếp theo chúng ta cài đặt môi trường ảo(virtual environment) đi�
 ```
 $ \flask-tutorial>py -m venv venv
 ```
-Sau khi khởi tạo môi trường ảo thành công bạn sẽ có môi trường ảo trong thư mục venv. Đến đây cần kích hoạt môi trường ảo này:
+Sau khi khởi tạo thành công bạn sẽ có môi trường ảo trong thư mục _venv_. Đến đây cần kích hoạt môi trường ảo này:
 
 ```
 $ flask-tutorial> cd venv\Scripts\
 $ flask-tutorial\venv\Scripts> activate
 ```
-Sau khi activate xong thì dấu nhắc lệnh của chúng ta sẽ hiểu thị như sau:
+Sau khi _activate_ xong thì dấu nhắc lệnh của chúng ta sẽ hiểu thị như sau:
 ```
 (venv) $ flask-tutorial\venv\Scripts>
 ```
-Dưới đây là cây thư mục cuối cùng của dự án, chúng ta sẽ khởi tạo từ từ từng file một nhé:
+Dưới đây là cây thư mục cuối cùng của dự án, chúng ta sẽ đi theo từng mục một nhé:
 ```
 flask-tutorial/
 |-- flaskr/
@@ -117,7 +117,7 @@ flask-tutorial/
  - Bất kì tệp nào khác bạn thêm vào trong tương lai.
 <a name="Thietlapungdung"></a>
 ### 2. Thiết lập ứng dụng
-Như mình đã giới thiệu cấu trúc này dựa trên tutorial chính thức của Flask, nên mình nghĩ hãy đi theo cách khởi tạo ứng dụng của Flask để đạt được sự tối ưu nhất cho ứng dụng.
+Như mình đã giới thiệu bài viết này là tutorial chính thức của Flask, nên hãy làm theo Flask để đạt được sự tối ưu nhất cho ứng dụng.
 
 ### Khởi tạo thư mục chứa ứng dụng
 
@@ -182,14 +182,14 @@ def create_app(test_config=None):
 - ```os.makedirs()``` đảm bảo rằng _app.instance_path_ tồn tại. Flask không tự động tạo thư mục cá thế, thư mục cá thể cần bạn tạo ra để nó có thể khởi tạo SQLite ở đó.
 
 ### Khởi chạy ứng dụng lần đầu tiên:
-Nếu như các bài hướng dẫn khác, họ tạo trực tiếp file _app.py_ ngay bên ngoài thư mục chính do đó chỉ cần chạy _flask run_ theo mặc định flask sẽ tìm được _app_ và khởi tạo nó. Tuy nhiên, phần này ta cần phải chỉ định cho Flask biết tìm _app_ ở đâu:
+Các bài hướng dẫn khác, thường tạo trực tiếp file _app.py_ ngay bên ngoài thư mục chính do đó chỉ cần chạy _flask run_ theo mặc định flask sẽ tìm được _app_ và khởi tạo nó. Tuy nhiên, phần này ta cần phải chỉ định cho Flask biết tìm _app_ ở đâu:
 ```
 (venv) $ \flask-tutorial> set FLASK_APP=flaskr
 (venv) $ \flask-tutorial> set FLASK_ENV=development
 (venv) $ \flask-tutorial> flask run
 ```
 
-Đây là hướng dẫn trực tiếp từ tutorial của flask tuy nhiên nếu chạy không được thì hãy sử dụng:
+Tuy nhiên nếu không được(mình không biết vì sao luôn) thì hãy sử dụng:
 ```
 (venv) $ \flask-tutorial> $env:FLASK_APP = "flaskr"
 (venv) $ \flask-tutorial> $env:FLASK_ENV = "development"
@@ -206,11 +206,11 @@ Bạn sẽ thấy một thống báo từ terminal tương tự:
 * Debugger is active!
 * Debugger PIN: 855-212-761
 ```
-Mở chrome và gõ vào địa chỉ : http://127.0.0.1:5000/ bạn sẽ thấy dòng chữ "Hello, World!"
+Mở browser và nhập địa chỉ : http://127.0.0.1:5000/ bạn sẽ thấy dòng chữ "Hello, World!"
 
 <a name="Sudungcosodulieu"></a>
 ### 3. Sử dụng cơ sở dữ liệu
-Ứng dụng sẽ sử dụng SQLite để lưu trữ người dùng(user) và bài đăng(post). SQLite tiện lợi vì nó được tích hợp sẵn trong Python. Tuy nhiên nó sẽ chậm một chút nếu các yêu cầu ghi vào cơ sở dữ liệu xảy ra đồng thời. Với ứng dụng nhỏ sẽ không nhận ra điều này tuy nhiên khi ứng dụng trở nên lớn hơn, bạn sẽ muốn chuyển qua một cơ sở dữ liệu khác.
+Ứng dụng sẽ sử dụng SQLite để lưu trữ người dùng( user) và bài đăng( post). SQLite tiện lợi vì nó được tích hợp sẵn trong Python. Tuy nhiên nó sẽ chậm một chút nếu các yêu cầu ghi vào cơ sở dữ liệu xảy ra đồng thời. Với ứng dụng nhỏ sẽ không nhận ra điều này tuy nhiên khi ứng dụng trở nên lớn hơn, bạn sẽ muốn chuyển qua một cơ sở dữ liệu khác.
 
 #### Kết nối với cơ sở dữ liệu
 Điều đầu tiên khi làm việc với SQLite và các cơ sở dữ liệu khác đó là tạo kết nối với nó. Mọi truy vấn, thao tác đều được thực hiện bằng kết nối và nó sẽ được đóng sau khi kết thúc công việc.
@@ -295,7 +295,7 @@ def init_db_command():
 - ```click.command()``` định nghĩa một dòng lệnh có tên _init-db_ gọi hàm _init_db_ và hiển thị thông báo thành công cho người dùng.
 - 
 #### Đăng ký với ứng dụng
-Các hàm _close_db_ và _init_db_command_ cần được đăng ký với phiên bản ứng dụng; nếu không, chúng sẽ không được ứng dụng sử dụng. Tuy nhiên, vì bạn đang sử dụng một hàm gốc nên phiên bản đó không khả dụng khi viết các hàm. Thay vào đó, hãy viết một hàm nhận đơn đăng ký và thực hiện đăng ký.
+Các hàm _close_db_ và _init_db_command_ cần được đăng ký với ứng dụng; nếu không, chúng sẽ không được ứng dụng sử dụng. Tuy nhiên, vì bạn đang sử dụng một hàm gốc nên phiên bản đó không khả dụng khi viết các hàm. Thay vào đó, hãy viết một hàm nhận đơn đăng ký và thực hiện đăng ký.
 
 ```flaskr/db.py```
 

@@ -1,35 +1,18 @@
 # Flask-Tutorial
-Bài viết này dịch từ trang chủ của flask: https://flask.palletsprojects.com/en/2.0.x/
+Bài viết này được lấy từ trang chủ của flask: https://flask.palletsprojects.com/en/2.0.x/
 ### Mục lục
 
 [I. Mở đầu](#Modau)
-- [1. Lời giới thiệu]
-- [2. Kiến thức cần chuẩn bị]
+- [1. Lời giới thiệu](#Loigioithieu)
+- [2. Kiến thức cần chuẩn bị](#Kienthuccanchuanbi)
 
 [II. Cài đặt](#Caidat)
-- [1. Python]
-- [2. Sự phụ thuộc]
-- [3. Môi trường ảo]
-- [4. Cài đặt Flask]
+- [1. Python](#Python)
+- [2. Sự phụ thuộc](#Suphuthuoc)
+- [3. Môi trường ảo](#Moitruongao)
+- [4. Cài đặt Flask](CaidatFlask)
 
 [III. Bắt đầu nhanh](#Batdaunhanh)
-- [1. Khởi đầu một ứng dụng nhỏ]
-- [2. Các khởi chạy server]
-- [3. Chế độ gỡ lỗi]
-- [4. HTML]
-- [5. Định tuyến]
-- [6. Files tĩnh]
-- [7. Kết xuất mẫu]
-- [8. Truy cập dữ liệu]
-- [9. Chuyển hướng và lỗi]
-- [10. Giới thiệu]
-- [11. Phiên]
-- [12. Tin nhắn]
-- [13. Ghi nhật ký]
-- [14. WSGI]
-- [15. Middleware]
-- [16. Sử dụng tiện ích mở rộng]
-- [17. Triển khai tới máy chủ web]
 
 [IV. Hướng dẫn](#Huongdan)
 - [1. Bố cục dự án](#Bocucduan)
@@ -62,6 +45,8 @@ Bài viết này dịch từ trang chủ của flask: https://flask.palletsproje
 <a name="Batdaunhanh"></a>
 ## III. Bắt đầu nhanh
 <a name="Huongdan"></a>
+Phần này Flask hướng dẫn sử dụng các thành phần chính khi xây dựng ứng dụng.
+Các bạn có thể xem trực tiếp trên trang chủ Flask.
 ## IV. Hướng dẫn
 <a name="Bocucduan"></a>
 ### x 1. Bố cục dự án

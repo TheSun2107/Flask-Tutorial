@@ -5,11 +5,13 @@ Bài viết này dịch từ trang chủ của flask: https://flask.palletsproje
 [I. Mở đầu](#Modau)
 - [1. Lời giới thiệu]
 - [2. Kiến thức cần chuẩn bị]
+
 [II. Cài đặt](#Caidat)
 - [1. Python]
 - [2. Sự phụ thuộc]
 - [3. Môi trường ảo]
 - [4. Cài đặt Flask]
+
 [III. Bắt đầu nhanh](#Batdaunhanh)
 - [1. Khởi đầu một ứng dụng nhỏ]
 - [2. Các khởi chạy server]
@@ -28,6 +30,7 @@ Bài viết này dịch từ trang chủ của flask: https://flask.palletsproje
 - [15. Middleware]
 - [16. Sử dụng tiện ích mở rộng]
 - [17. Triển khai tới máy chủ web]
+
 [IV. Hướng dẫn](#Huongdan)
 - [1. Bố cục dự án](#Bocucduan)
 - [2. Thiết lập ứng dụng](#Thietlapungdung)
@@ -42,6 +45,7 @@ Bài viết này dịch từ trang chủ của flask: https://flask.palletsproje
 - [9. Kiểm tra](#Kiemtra)
 - [10. Triển khai](#Trienkhai)
 - [11. Phát triển](#Phatrien)
+
 [V. Mẫu](#Mau)
 [VI. Thử nghiệm](#Thunghiem)
 [VII. Xử lý lỗi](#Xulyloi)

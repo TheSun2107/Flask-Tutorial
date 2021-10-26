@@ -1,5 +1,5 @@
 # Flask-Tutorial
-Bài viết này được lấy từ trang chủ của flask: https://flask.palletsprojects.com/en/2.0.x/
+Bài viết này được lấy từ <a href="https://flask.palletsprojects.com/">trang chủ</a> của Flask.
 ### Mục lục
 
 [I. Mở đầu](#Modau)
@@ -60,10 +60,9 @@ Các bạn có thể xem trực tiếp trên trang chủ Flask.
 Trong hướng dẫn này mình sử dụng HDH Windows 10 và Visual Studio Code(1.61.2)
 <a name="Bocucduan"></a>
 ### 1. Bố cục dự án
-#### Đầu tiên hãy cài đặt Python nhé: 
-https://www.python.org/downloads/
+#### Đầu tiên hãy cài đặt Python nhé:
 
-Phiên bản python mình sử dụng: Python 3.9.7
+Phiên bản python mình sử dụng: <a href="https://www.python.org/downloads/release/python-397/">Python 3.9.7</a>
 
 #### Khởi tạo thư mục chính:
 ```

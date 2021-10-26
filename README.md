@@ -1,5 +1,5 @@
 # Flask-Tutorial
-Bài viết này được lấy từ trang chủ của flask: https://flask.palletsprojects.com/en/2.0.x/
+Bài viết này được lấy từ <a href="https://flask.palletsprojects.com/">trang chủ</a> của Flask.
 ### Mục lục
 
 [I. Mở đầu](#Modau)
@@ -60,10 +60,9 @@ Các bạn có thể xem trực tiếp trên trang chủ Flask.
 Trong hướng dẫn này mình sử dụng HDH Windows 10 và Visual Studio Code(1.61.2)
 <a name="Bocucduan"></a>
 ### 1. Bố cục dự án
-#### Đầu tiên hãy cài đặt Python nhé: 
-https://www.python.org/downloads/
+#### Đầu tiên hãy cài đặt Python nhé:
 
-Phiên bản python mình sử dụng: Python 3.9.7
+Phiên bản python mình sử dụng: <a href="https://www.python.org/downloads/release/python-397/">Python 3.9.7</a>
 
 #### Khởi tạo thư mục chính:
 ```
@@ -568,7 +567,255 @@ Tương tự như register.html
 {% endblock %}
 ```
 Đến đây hay thử chạy server và đăng kí một user.
+
 Note: Hãy lưu ý phần FLASK_APP nhé.
-<a name="Banthietke"></a>
-<a name="Mau"></a>
-<a name="Filestinh"></a>
+
+#### Trang chủ
+
+Tiếp theo: Sau khi đăng nhập Flask sẽ trả về url_for('index'). Index này ta sẽ đặt trong blueprint 'blog', trước hết ta sẽ khai báo một blueprint là 'blog' với ứng dụng tương tự như khi khai báo blueprint 'auth' nhé.
+
+```flaskr/blog.py```
+```
+from flask import (
+    Blueprint, flash, g, redirect, render_template, request, url_for
+)
+from werkzeug.exceptions import abort
+
+from flaskr.auth import login_required
+from flaskr.db import get_db
+
+bp = Blueprint('blog', __name__)
+```
+```flaskr/__init__.py```
+```
+def create_app():
+    ...
+
+    from . import blog
+    app.register_blueprint(blog.bp)
+    app.add_url_rule('/', endpoint='index')
+
+    return app
+```
+- Không giống như blueprint 'auth', 'blog' không có url_prefix. Vì vậy, dạng xem index sẽ ở /, Blog là tính năng chính của Flaskr, vì vậy có ý nghĩa rằng chỉ mục blog sẽ là chỉ mục chính.
+- Tuy nhiên, điểm cuối cho chế độ xem index được xác định bên dưới sẽ là blog.index. Một số dạng xem xác thực đề cập đến một điểm cuối index thuần túy. app.add_url_rule() liên kết tên điểm cuối 'index' với /url để url_for ('index') hoặc url_for('blog.index') đều hoạt động, tạo ra cùng một URL / theo cách nào đó.
+Index sẽ hiển thị tất cả các bài Post, gần đây nhất trước tiên. Một JOIN được sử dụng để thông tin tác giả từ bảng người dùng có sẵn trong kết quả.
+
+```flaskr/blog.py```
+```
+@bp.route('/')
+def index():
+    db = get_db()
+    posts = db.execute(
+        'SELECT p.id, title, body, created, author_id, username'
+        ' FROM post p JOIN user u ON p.author_id = u.id'
+        ' ORDER BY created DESC'
+    ).fetchall()
+    return render_template('blog/index.html', posts=posts)
+```
+```flaskr/templates/blog/index.html```
+```
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Posts{% endblock %}</h1>
+  {% if g.user %}
+    <a class="action" href="{{ url_for('blog.create') }}">New</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  {% for post in posts %}
+    <article class="post">
+      <header>
+        <div>
+          <h1>{{ post['title'] }}</h1>
+          <div class="about">by {{ post['username'] }} on {{ post['created'].strftime('%Y-%m-%d') }}</div>
+        </div>
+        {% if g.user['id'] == post['author_id'] %}
+          <a class="action" href="{{ url_for('blog.update', id=post['id']) }}">Edit</a>
+        {% endif %}
+      </header>
+      <p class="body">{{ post['body'] }}</p>
+    </article>
+    {% if not loop.last %}
+      <hr>
+    {% endif %}
+  {% endfor %}
+{% endblock %}
+```
+Một chút kiến thức với jinja sẽ giúp bạn hiểu về các vòng lặp trong đoạn code trên nhé.
+Chức năng trang chủ để hiển thị Post đã hoàn thành nhưng chúng ta chưa có bài viết nào để hiển thị cả, hãy xây dựng một form create post nhé.
+Trước hết là tạo form để tạo post. Trước hết hãy yêu cầu user đăng nhập để có thể sử dụng tính năng này(dùng login_required)
+#### Create
+```flaskr/blog.py```
+```
+@bp.route('/create', methods=('GET', 'POST'))
+@login_required
+def create():
+    if request.method == 'POST':
+        title = request.form['title']
+        body = request.form['body']
+        error = None
+
+        if not title:
+            error = 'Title is required.'
+
+        if error is not None:
+            flash(error)
+        else:
+            db = get_db()
+            db.execute(
+                'INSERT INTO post (title, body, author_id)'
+                ' VALUES (?, ?, ?)',
+                (title, body, g.user['id'])
+            )
+            db.commit()
+            return redirect(url_for('blog.index'))
+
+    return render_template('blog/create.html')
+```
+```flaskr/templates/blog/create.html```
+```
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}New Post{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    <label for="title">Title</label>
+    <input name="title" id="title" value="{{ request.form['title'] }}" required>
+    <label for="body">Body</label>
+    <textarea name="body" id="body">{{ request.form['body'] }}</textarea>
+    <input type="submit" value="Save">
+  </form>
+{% endblock %}
+```
+#### Update
+Cả chế độ Update và delete sẽ cần tìm nạp một post theo id và kiểm tra xem tác giả có khớp với user đã đăng nhập hay không. Để tránh trùng lặp mã, bạn có thể viết một hàm để lấy post và gọi nó từ mỗi lần xem.
+```flaskr/blog.py```
+```
+def get_post(id, check_author=True):
+    post = get_db().execute(
+        'SELECT p.id, title, body, created, author_id, username'
+        ' FROM post p JOIN user u ON p.author_id = u.id'
+        ' WHERE p.id = ?',
+        (id,)
+    ).fetchone()
+
+    if post is None:
+        abort(404, f"Post id {id} doesn't exist.")
+
+    if check_author and post['author_id'] != g.user['id']:
+        abort(403)
+
+    return post
+```
+- abort() sẽ đưa ra một ngoại lệ đặc biệt trả về mã trạng thái HTTP. Nó cần một thông báo tùy chọn để hiển thị cùng với lỗi, nếu không, một thông báo mặc định sẽ được sử dụng. 404 có nghĩa là "Not Found" và 403 có nghĩa là "Forbidden". (401 có nghĩa là “Unauthorized”, nhưng bạn chuyển hướng đến trang login thay vì trả lại trạng thái đó.)
+- check_author được định nghĩa để hàm có thể được sử dụng để lấy một post mà không cần kiểm tra tác giả. Điều này sẽ hữu ích nếu bạn viết một lượt xem để hiển thị từng post trên một trang, nơi người dùng không quan trọng vì họ không sửa đổi bài đăng.
+```flaskr/blog.py```
+```
+@bp.route('/<int:id>/update', methods=('GET', 'POST'))
+@login_required
+def update(id):
+    post = get_post(id)
+
+    if request.method == 'POST':
+        title = request.form['title']
+        body = request.form['body']
+        error = None
+
+        if not title:
+            error = 'Title is required.'
+
+        if error is not None:
+            flash(error)
+        else:
+            db = get_db()
+            db.execute(
+                'UPDATE post SET title = ?, body = ?'
+                ' WHERE id = ?',
+                (title, body, id)
+            )
+            db.commit()
+            return redirect(url_for('blog.index'))
+
+    return render_template('blog/update.html', post=post)
+```
+- Không giống như các chế độ xem bạn đã viết cho đến nay, hàm update có một đối số là id. Điều đó tương ứng với <int: id> trong route. URL thực sẽ giống như /1/update. Flask sẽ nắm bắt giá trị 1, đảm bảo nó là int và chuyển nó làm đối số id. Nếu bạn không chỉ định int: và thay vào đó là <id>, nó sẽ là một chuỗi. Để tạo URL cho trang update, url_for () cần được chuyển id để nó biết cần điền gì vào: url_for('blog.update', id=post ['id']). Đây cũng là tệp index.html ở trên.
+- Chế độ xem tạo và update trông rất giống nhau. Sự khác biệt chính là dạng xem update sử dụng đối tượng bài đăng và truy vấn UPDATE thay vì INSERT. Với một số cấu trúc thông minh, bạn có thể sử dụng một chế độ xem và template cho cả hai hành động, nhưng đối với tutorial này, rõ ràng hơn là giữ chúng riêng biệt.
+
+```flaskr/templates/blog/update.html```
+```
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Edit "{{ post['title'] }}"{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    <label for="title">Title</label>
+    <input name="title" id="title"
+      value="{{ request.form['title'] or post['title'] }}" required>
+    <label for="body">Body</label>
+    <textarea name="body" id="body">{{ request.form['body'] or post['body'] }}</textarea>
+    <input type="submit" value="Save">
+  </form>
+  <hr>
+  <form action="{{ url_for('blog.delete', id=post['id']) }}" method="post">
+    <input class="danger" type="submit" value="Delete" onclick="return confirm('Are you sure?');">
+  </form>
+{% endblock %}
+```
+- Template này có hai dạng. Đầu tiên đăng dữ liệu đã chỉnh sửa lên trang hiện tại(/<id>/update). Form khác chỉ chứa một nút và chỉ định một thuộc tính hành động sẽ đăng lên dạng xem xóa. Nút này sử dụng một số JavaScript để hiển thị hộp thoại xác nhận trước khi gửi.
+
+- Mẫu {{request.form['title'] hoặc post['title']}} được sử dụng để chọn dữ liệu xuất hiện trong form. Khi form chưa được gửi, dữ liệu post ban đầu sẽ xuất hiện, nhưng nếu dữ liệu post không hợp lệ đã được đăng, bạn muốn hiển thị dữ liệu đó để user có thể sửa lỗi, do đó, request.form sẽ được sử dụng thay thế. yêu cầu là một biến khác tự động có sẵn trong các templates.
+#### Delete
+Chế độ xem delete không có tempalte riêng, nút xóa là một phần của update.html và đăng lên URL/ <id>/delete. Vì không có template, nó sẽ chỉ xử lý phương thức POST và sau đó chuyển hướng đến index.
+```flaskr/blog.py```
+```
+@bp.route('/<int:id>/delete', methods=('POST',))
+@login_required
+def delete(id):
+    get_post(id)
+    db = get_db()
+    db.execute('DELETE FROM post WHERE id = ?', (id,))
+    db.commit()
+    return redirect(url_for('blog.index'))
+```
+Blog của bạn gần như đã hoàn thành tuy nhiên hãy để ý đến base.html có một đường dẫn đến file css. Hãy thêm style.css để cập nhật giao diện cho blog của mình.
+```style.css```
+```
+html { font-family: sans-serif; background: #eee; padding: 1rem; }
+body { max-width: 960px; margin: 0 auto; background: white; }
+h1 { font-family: serif; color: #377ba8; margin: 1rem 0; }
+a { color: #377ba8; }
+hr { border: none; border-top: 1px solid lightgray; }
+nav { background: lightgray; display: flex; align-items: center; padding: 0 0.5rem; }
+nav h1 { flex: auto; margin: 0; }
+nav h1 a { text-decoration: none; padding: 0.25rem 0.5rem; }
+nav ul  { display: flex; list-style: none; margin: 0; padding: 0; }
+nav ul li a, nav ul li span, header .action { display: block; padding: 0.5rem; }
+.content { padding: 0 1rem 1rem; }
+.content > header { border-bottom: 1px solid lightgray; display: flex; align-items: flex-end; }
+.content > header h1 { flex: auto; margin: 1rem 0 0.25rem 0; }
+.flash { margin: 1em 0; padding: 1em; background: #cae6f6; border: 1px solid #377ba8; }
+.post > header { display: flex; align-items: flex-end; font-size: 0.85em; }
+.post > header > div:first-of-type { flex: auto; }
+.post > header h1 { font-size: 1.5em; margin-bottom: 0; }
+.post .about { color: slategray; font-style: italic; }
+.post .body { white-space: pre-line; }
+.content:last-child { margin-bottom: 0; }
+.content form { margin: 1em 0; display: flex; flex-direction: column; }
+.content label { font-weight: bold; margin-bottom: 0.5em; }
+.content input, .content textarea { margin-bottom: 1em; }
+.content textarea { min-height: 12em; resize: vertical; }
+input.danger { color: #cc2f2e; }
+input[type=submit] { align-self: start; min-width: 10em; }
+```
+Hãy thử chạy Flask và thử các tính năng.
+
+Note: Hãy để ý đến (venv) và FLASK_APP.

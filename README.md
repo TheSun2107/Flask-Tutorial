@@ -1,5 +1,5 @@
 # Flask-Tutorial
-Bài viết này được lấy từ <a href="https://flask.palletsprojects.com/">trang chủ</a> của Flask.
+Bài viết này được dịch dựa trên <a href="https://flask.palletsprojects.com/">trang chủ</a> của Flask.
 ### Mục lục
 
 [I. Mở đầu](#Modau)
@@ -10,22 +10,33 @@ Bài viết này được lấy từ <a href="https://flask.palletsprojects.com/
 
 [III. Bắt đầu nhanh](#Batdaunhanh)
 
-[IV. Hướng dẫn](#Huongdan)
-- [1. Bố cục dự án](#Bocucduan)
-- [2. Thiết lập ứng dụng](#Thietlapungdung)
-    - [2.1. ]
-    - [2.2. ]
-- [3. Sử dụng cơ sở dữ liệu](#Sudungcosodulieu)
-- [4. Bản thiết kế](#Banthietke)
-- [5. Mẫu](#Mau)
-- [6. Files tĩnh](#Filestinh)
-- [7. Bản thiết kế trang cá nhân](#Banthietketrangcanhan)
-- [8. Cấu hình để cài đặt](#Cauhinhdecaidat)
-- [9. Kiểm tra](#Kiemtra)
-- [10. Triển khai](#Trienkhai)
-- [11. Phát triển](#Phatrien)
+[IV. Hướng dẫn](#tutorial)
+- [1. Bố cục dự án](#projectlayout)
+    - [1.1 Cài đặt](#install)
+    - [1.2 Tạo thư mục dự án](#createproject)
+- [2. Bắt đầu](#start)
+    - [2.1 Tạo ứng dụng](#createapp)
+    - [2.2 Chạy ứng dụng](#runapp)
+- [3. Sử dụng cơ sở dữ liệu](#usedatabase)
+    - [3.1 Kết nối cơ sở dữ liệu](#connectdatabase)
+    - [3.2 Tạo bảng](#createtable)
+    - [3.3 Đăng ký cơ sở dữ liệu với ứng dụng](#registerdatabase)
+    - [3.4 Tạo nơi lưu trữ cho cơ sở dữ liệu](#createfiledatabase)
+- [4. Blueprint - Bản thiết kế](#blueprint)
+    - [4.1 Đăng ký](#register)
+    - [4.2 Đăng nhập](#login)
+    - [4.3 Xác thực](#authentication)
+ 
+- [5. Templates](#templates)
+    - [5.1 Mẫu chung](#basetemplate)
+    - [5.2 Mẫu trang đăng ký](#registertemplate)
+    - [5.3 Mẫu trang đăng nhập](#logintemplate)
+    - [5.4 Mẫu trang chỉ mục](#indextemplate)
+    - [5.5 Mẫu tạo bài đăng](#createtemplate)
+    - [5.6 Mẫu cập nhật](#updatetemplate)
+    - [5.7 Mẫu xóa](#deletetemplate)
+    - [5.8 Nâng cấp giao diện](#updatetemplate)
 
-[V. Mẫu](#Mau)
 [VI. Thử nghiệm](#Thunghiem)
 [VII. Xử lý lỗi](#Xulyloi)
 [VIII. Gỡ lỗi](#Goloi)
@@ -53,18 +64,19 @@ Flask không như Django, khi bạn khởi tạo một project từ Django, nó 
 Phần này chúng ta sẽ sử dụng luôn phần IV.
 <a name="Batdaunhanh"></a>
 ## III. Bắt đầu nhanh
-<a name="Huongdan"></a>
 Phần này Flask hướng dẫn sử dụng các thành phần chính khi xây dựng ứng dụng.
 Các bạn có thể xem trực tiếp trên trang chủ Flask.
+<a name="tutorial"></a>
 ## IV. Hướng dẫn
 Trong hướng dẫn này mình sử dụng HDH Windows 10 và Visual Studio Code(1.61.2)
-<a name="Bocucduan"></a>
+<a name="projectlayout"></a>
 ### 1. Bố cục dự án
-#### Đầu tiên hãy cài đặt Python nhé:
+<a name="install"></a>
+#### 1.1 Cài đặt Python
 
 Phiên bản python mình sử dụng: <a href="https://www.python.org/downloads/release/python-397/">Python 3.9.7</a>
-
-#### Khởi tạo thư mục chính:
+<a name="createproject"></a>
+#### 1.2 Tạo dự án:
 ```
 $ mkdir flask-tutorial
 $ cd flask-tutorial
@@ -114,11 +126,11 @@ flask-tutorial/
  - **tests/**, một thư mục chứa các module kiểm tra.
  - **venv/**, một môi trường ảo Python nơi Flask và các gói phụ thuộc được cài đặt độc lập so với hdh.
  - Bất kì tệp nào khác bạn thêm vào trong tương lai.
-<a name="Thietlapungdung"></a>
-### 2. Thiết lập ứng dụng
+<a name="start"></a>
+### 2. Bắt đầu
 Như mình đã giới thiệu bài viết này là tutorial chính thức của Flask, nên hãy làm theo Flask để đạt được sự tối ưu nhất cho ứng dụng.
-
-#### Khởi tạo thư mục chứa ứng dụng
+<a name="createapp"></a>
+#### 2.1 Tạo ứng dụng
 
 ```
 $ \flask-tutorial> mkdir flaskr
@@ -179,8 +191,8 @@ def create_app(test_config=None):
 - ```test_config``` cũng để ghi đè cấu hình để thực hiện trong các bài kiểm tra.
 
 - ```os.makedirs()``` đảm bảo rằng _app.instance_path_ tồn tại. Flask không tự động tạo thư mục cá thế, thư mục cá thể cần bạn tạo ra để nó có thể khởi tạo SQLite ở đó.
-
-#### Khởi chạy ứng dụng lần đầu tiên:
+<a name="runapp"></a>
+#### 2.2 Chạy ứng dụng lần đầu:
 Các bài hướng dẫn khác, thường tạo trực tiếp file _app.py_ ngay bên ngoài thư mục chính do đó chỉ cần chạy _flask run_ theo mặc định flask sẽ tìm được _app_ và khởi tạo nó. Tuy nhiên, phần này ta cần phải chỉ định cho Flask biết tìm _app_ ở đâu:
 ```
 (venv) $ \flask-tutorial> set FLASK_APP=flaskr
@@ -207,11 +219,11 @@ Bạn sẽ thấy một thống báo từ terminal tương tự:
 ```
 Mở browser và nhập địa chỉ : http://127.0.0.1:5000/ bạn sẽ thấy dòng chữ "Hello, World!"
 
-<a name="Sudungcosodulieu"></a>
+<a name="usedatabase"></a>
 ### 3. Sử dụng cơ sở dữ liệu
 Ứng dụng sẽ sử dụng SQLite để lưu trữ người dùng( user) và bài đăng( post). SQLite tiện lợi vì nó được tích hợp sẵn trong Python. Tuy nhiên nó sẽ chậm một chút nếu các yêu cầu ghi vào cơ sở dữ liệu xảy ra đồng thời. Với ứng dụng nhỏ sẽ không nhận ra điều này tuy nhiên khi ứng dụng trở nên lớn hơn, bạn sẽ muốn chuyển qua một cơ sở dữ liệu khác.
-
-#### Kết nối với cơ sở dữ liệu
+<a name="connectdatabase"></a>
+#### 3.1 Kết nối cơ sở dữ liệu
 Điều đầu tiên khi làm việc với SQLite và các cơ sở dữ liệu khác đó là tạo kết nối với nó. Mọi truy vấn, thao tác đều được thực hiện bằng kết nối và nó sẽ được đóng sau khi kết thúc công việc.
 Trong các ứng dụng web, các kết nối này thường gắn với yêu cầu(request). Nó được tạo tại một số thời điểm khi xử lý một yêu cầu và đóng trước khi phản hổi được gửi đi.
 
@@ -246,9 +258,8 @@ def close_db(e=None):
 - ```sqlite3.connect()``` thiết lập kết nối đến tệp được chỉ vào bởi khóa cấu hình _DATABASE_. Tệp này không cần phải tồn tại và sẽ không tồn tại cho đến khi bạn khởi chạy cơ sở dữ liệu sau đó.
 - ```sqlite3.Row``` cho kết nối trả về các hàng hoạt động giống như các dòng. Điều này cho phép truy cập các cột theo tên.
 - ```close_db``` kiểm tra xem kết nối đã được tạo chưa bằng cách kiểm tra xem _g.db_ đã được đặt chưa. Nếu kết nối tồn tại, nó bị đóng. Sâu hơn nữa, bạn sẽ thông báo cho ứng dụng của mình về hàm _close_db_ trong nhà máy ứng dụng để nó được gọi sau mỗi yêu cầu.
-
-#### Tạo các bảng
-
+<a name="createtable"></a>
+#### 3.2 Tạo bảng
 Trong SQLite, dữ liệu được lưu trữ trong các bảng và cột. Chúng cần được tạo trước khi bạn có thể lưu trữ và truy xuất dữ liệu. Flaskr sẽ lưu trữ người dùng trong bảng _user_ và bài đăng trong bảng _post_. Tạo tệp bằng các lệnh SQL cần thiết để tạo bảng trống:
 
 ```flaskr/schema.sql```
@@ -292,8 +303,8 @@ def init_db_command():
 ```
 - ```open_resource()```mở một tệp liên quan đến gói flaskr, nó rất hữu ích vì bạn sẽ không nhất thiết phải biết vị trí đó khi triển khai ứng dụng sau này. _get_db_ trả về một kết nối cơ sở dữ liệu, được sử dụng để thực thi các lệnh được đọc từ tệp.
 - ```click.command()``` định nghĩa một dòng lệnh có tên _init-db_ gọi hàm _init_db_ và hiển thị thông báo thành công cho người dùng.
-- 
-#### Đăng ký với ứng dụng
+<a name="registerdatabase"></a>
+#### 3.3 Đăng ký cơ sở dữ liệu với ứng dụng
 Các hàm _close_db_ và _init_db_command_ cần được đăng ký với ứng dụng; nếu không, chúng sẽ không được ứng dụng sử dụng. Tuy nhiên, vì bạn đang sử dụng một hàm gốc nên phiên bản đó không khả dụng khi viết các hàm. Thay vào đó, hãy viết một hàm nhận đơn đăng ký và thực hiện đăng ký.
 
 ```flaskr/db.py```
@@ -318,8 +329,8 @@ def create_app():
 
     return app
  ```
- #### Khởi tạo tệp cơ sở dữ liệu
- 
+ <a name="createfiledatabase"></a>
+ #### 3.4 Tạo nơi lưu trữ cho cơ sở dữ liệu
  Bây giờ _init-db_ đã được đăng kí với ứng dụng, nó có thể được gọi bằng lệnh flask.
  
  _Note:_
@@ -331,8 +342,8 @@ def create_app():
  Initialized the database.
  ```
  Bây giờ sẽ có một tệp _flaskr.sqlite_ trong thư mục _instance_.
- 
- #### Blueprint: Mẫu
+ <a name="blueprint"></a>
+ ### 4. Blueprint: Bản thiết kế
  Blueprint hiểu như là một khuôn mẫu tối ưu nhất cho ứng dụng của bạn. Thông thường mỗi khi thêm tính năng cho ứng dụng ta phải khai báo cho ứng dụng biết. Blueprint giúp ta quy hoạch các tính năng thành từng gói để dễ dàng quản lý và định tuyến hơn. Ta sẽ tạo từng tính năng với các modules khác nhau và khai báo chúng với blueprint, Blueprint sẽ khai báo với ứng dụng để sử dụng chúng.
 
  ```flaskr/auth.py```
@@ -361,8 +372,8 @@ def create_app():
     return app
 ```
 Khai báo blueprint 'auth' cho ứng dụng biết.
-
-#### Đầu tiên hãy tạo một trang đăng nhập và đăng kí
+<a name="register"></a>
+#### 4.1 Đăng ký
 
 ```flaskr/auth.py```
 ```
@@ -395,17 +406,17 @@ def register():
 
     return render_template('auth/register.html')
 ```
-- @bp.route('/register'..) Tạo một liên kết với URL và hàm xử lý nó.
+- ```@bp.route('/register'..)``` Tạo một liên kết với URL và hàm xử lý nó.
 - Nếu người dùng đã gửi biểu mẫu với request.method là 'POST' thì hãy bắt đầu xác thực input.
-- request.form sẽ lấy giá trị người dùng nhập vào gồm "username" và "password" Nếu thành công sẽ ghi người dùng mới vào cơ sở dữ liệu.
-- db.execute() sẽ đảm bảo rằng SQL của bạn khỏi hình thức tấn công SQL Injection.
-- create_password_hash() để bảo mật không lưu password dưới dạng text trong cơ sở dữ liệu.
-- Lỗi sqlite3.IntegrityError sẽ xảy ra nếu tên người dùng đã tồn tại, điều này sẽ được hiển thị cho người dùng dưới dạng một lỗi xác thực khác.
+- ```request.form``` sẽ lấy giá trị người dùng nhập vào gồm "username" và "password" Nếu thành công sẽ ghi người dùng mới vào cơ sở dữ liệu.
+- ```db.execute()``` sẽ đảm bảo rằng SQL của bạn khỏi hình thức tấn công SQL Injection.
+- ```create_password_hash()``` để bảo mật không lưu password dưới dạng text trong cơ sở dữ liệu.
+- ```sqlite3.IntegrityError``` sẽ xảy ra nếu tên người dùng đã tồn tại, điều này sẽ được hiển thị cho người dùng dưới dạng một lỗi xác thực khác.
 - Sau đó user được chuyển đến trang đăng nhập với url_for(). Điều này tốt hơn là viết URL trực tiếp vì nó cho phép bạn thay đổi URL sau này mà không cần thay đổi tất cả mã liên kết đến nó. redirect () tạo phản hồi chuyển hướng đến URL đã tạo.
 - Nếu xác thực không thành công, lỗi sẽ được hiển thị cho người dùng. flash() lưu trữ các thông báo có thể được truy xuất khi hiển thị template.
-- Khi người dùng ban đầu điều hướng đến auth / register hoặc có lỗi xác thực, một trang HTML có biểu mẫu đăng ký sẽ được hiển thị.
-
-#### Tiếp theo là phần Login
+- Khi người dùng ban đầu điều hướng đến auth/register hoặc có lỗi xác thực, một trang HTML có biểu mẫu đăng ký sẽ được hiển thị.
+<a name="login"></a>
+#### 4.2 Đăng nhập
 
 ```flaskr/auth.py```
 ```
@@ -434,11 +445,11 @@ def login():
 
     return render_template('auth/login.html')
 ```
-- @bp.route('/login') tương tự như register khi người dùng truy cập đường dẫn /auth/login nó sẽ gọi đến hàm xử lý URL đó.
+- ```@bp.route('/login')``` tương tự như register khi người dùng truy cập đường dẫn /auth/login nó sẽ gọi đến hàm xử lý URL đó.
 - Người dùng được truy vấn đầu tiên và được lưu trữ trong một biến để sử dụng sau này.
-- fetchone() trả về một hàng từ truy vấn. Nếu truy vấn không trả về kết quả, nó sẽ trả về Không có. Sau đó, hàm fetchall() sẽ được sử dụng, nó sẽ trả về một danh sách tất cả các kết quả.
-- check_password_hash() băm mật khẩu đã gửi theo cách giống như băm được lưu trữ và so sánh chúng một cách an toàn. Nếu chúng khớp, mật khẩu hợp lệ.
-- session là một mệnh lệnh lưu trữ dữ liệu qua các yêu cầu. Khi xác thực thành công, id của người dùng được lưu trữ trong một phiên mới. Dữ liệu được lưu trữ trong một cookie được gửi đến trình duyệt và sau đó trình duyệt sẽ gửi lại dữ liệu đó với các yêu cầu tiếp theo. Flask ký vào dữ liệu một cách an toàn để dữ liệu đó không thể bị giả mạo.
+- ```fetchone()``` trả về một hàng từ truy vấn. Nếu truy vấn không trả về kết quả, nó sẽ trả về Không có. Sau đó, hàm fetchall() sẽ được sử dụng, nó sẽ trả về một danh sách tất cả các kết quả.
+- ```check_password_hash()``` băm mật khẩu đã gửi theo cách giống như băm được lưu trữ và so sánh chúng một cách an toàn. Nếu chúng khớp, mật khẩu hợp lệ.
+- ```session``` là một mệnh lệnh lưu trữ dữ liệu qua các yêu cầu. Khi xác thực thành công, id của người dùng được lưu trữ trong một phiên mới. Dữ liệu được lưu trữ trong một cookie được gửi đến trình duyệt và sau đó trình duyệt sẽ gửi lại dữ liệu đó với các yêu cầu tiếp theo. Flask ký vào dữ liệu một cách an toàn để dữ liệu đó không thể bị giả mạo.
 
 Bây giờ, id của người dùng đã được lưu trữ trong phiên, nó sẽ có sẵn trong các yêu cầu tiếp theo. Khi bắt đầu mỗi yêu cầu, nếu người dùng đã đăng nhập, thông tin của họ sẽ được tải và cung cấp cho các chế độ xem khác.
 
@@ -460,10 +471,10 @@ def logout():
     session.clear()
     return redirect(url_for('index'))
 ```
-- bp.before_app_request() đăng ký một hàm chạy trước hàm xem, bất kể URL nào được yêu cầu. load_logged_in_user kiểm tra xem id người dùng có được lưu trữ trong phiên hay không và lấy dữ liệu của người dùng đó từ cơ sở dữ liệu, lưu trữ trên g.user, kéo dài trong thời gian yêu cầu. Nếu không có id người dùng hoặc nếu id không tồn tại, g.user sẽ là None.
+- ```bp.before_app_request()``` đăng ký một hàm chạy trước hàm xem, bất kể URL nào được yêu cầu. load_logged_in_user kiểm tra xem id người dùng có được lưu trữ trong phiên hay không và lấy dữ liệu của người dùng đó từ cơ sở dữ liệu, lưu trữ trên g.user, kéo dài trong thời gian yêu cầu. Nếu không có id người dùng hoặc nếu id không tồn tại, g.user sẽ là None.
 - Để đăng xuất, bạn cần xóa id người dùng khỏi phiên. Sau đó load_logged_in_user sẽ không tải người dùng trong các yêu cầu tiếp theo.
-
-#### Xác thực
+<a name="authentication"></a>
+#### 4.3 Xác thực
 Việc tạo, chỉnh sửa và xóa các bài đăng trên blog sẽ yêu cầu người dùng đăng nhập. Có thể sử dụng trình trang trí để kiểm tra điều này cho từng chế độ xem được áp dụng.
 ```flaskr/auth.py```
 ```
@@ -478,12 +489,14 @@ def login_required(view):
     return wrapped_view
 ```
 - Trình trang trí này trả về một hàm chế độ xem mới bao bọc chế độ xem ban đầu mà nó được áp dụng. Chức năng mới sẽ kiểm tra xem người dùng có được tải hay không và chuyển hướng đến trang đăng nhập theo cách khác. Nếu người dùng được tải, chế độ xem ban đầu được gọi và tiếp tục bình thường. Bạn sẽ sử dụng trình trang trí này khi viết các lượt xem blog.
-#### Xử lý các trang hiển thị
+<a name="templates"></a>
+### 5. Templates
 Phần trên chúng ta mới xử lý xong việc Flask sẽ làm việc như thế nào với cơ sở dữ liệu, tuy nhiên có một số chỗ cần để ý tới: khi auth yêu cầu trả về register.html, login.html, index.html.
 Để hiểu được phần này bạn cần có chút kiến thức về Jinja nữa nhé.
 Các file HTML chúng ta sẽ lưu toàn bộ vào folder templates để dễ dàng quản lý.
 Hầu hết các trang web sẽ có một cấu trúc cố định và giống nhau khi truy cập từng tính năng trong đó, để giảm thiểu dòng code và tăng tốc cho Flask ta sẽ sử dụng một cấu trúc chung cho trang web là base.html
-##### Cấu trúc chung
+<a name="basetemplate"></a>
+#### 5.1 Mẫu chung
 ```flaskr/templates/base.html```
 ```
 <!doctype html>
@@ -511,12 +524,14 @@ Hầu hết các trang web sẽ có một cấu trúc cố định và giống n
   {% block content %}{% endblock %}
 </section>
 ```
-- g tự động có sẵn trong các templates. Dựa trên nếu g.user được đặt (từ load_logged_in_user), tên người dùng và liên kết đăng xuất được hiển thị hoặc các liên kết để đăng ký và đăng nhập được hiển thị. url_for() cũng tự động có sẵn và được sử dụng để tạo URL cho các chế độ xem thay vì viết chúng ra theo cách thủ công.
+- ```g``` tự động có sẵn trong các templates. Dựa trên nếu g.user được đặt (từ load_logged_in_user), tên người dùng và liên kết đăng xuất được hiển thị hoặc các liên kết để đăng ký và đăng nhập được hiển thị. url_for() cũng tự động có sẵn và được sử dụng để tạo URL cho các chế độ xem thay vì viết chúng ra theo cách thủ công.
 - Sau tiêu đề trang và trước nội dung, mẫu lặp lại từng thông báo được trả về bởi get_flashed_messages(). Bạn đã sử dụng flash() trong các dạng xem để hiển thị thông báo lỗi và đây là mã sẽ hiển thị chúng.
-- {% block title%} sẽ thay đổi tiêu đề được hiển thị trong tab và tiêu đề cửa sổ của trình duyệt.
-- {% block header%} tương tự như title nhưng sẽ thay đổi tiêu đề hiển thị trên trang.
-- {% block content%} là nơi chứa nội dung của mỗi trang, chẳng hạn như biểu mẫu đăng nhập hoặc một bài đăng trên blog.
-##### Trang đăng kí
+- ```{% block title%}``` sẽ thay đổi tiêu đề được hiển thị trong tab và tiêu đề cửa sổ của trình duyệt.
+- ```{% block header%}``` tương tự như title nhưng sẽ thay đổi tiêu đề hiển thị trên trang.
+- ```{% block content%}``` là nơi chứa nội dung của mỗi trang, chẳng hạn như biểu mẫu đăng nhập hoặc một bài đăng trên blog.
+<a name="registertemplate"></a>
+#### 5.2 Mẫu đăng ký
+
 ```flaskr/templates/auth/register.html```
 ```
 <!doctype html>
@@ -546,7 +561,9 @@ Hầu hết các trang web sẽ có một cấu trúc cố định và giống n
 ```
 - {% extends 'base.html' %} register.html sẽ kế thừa các block của base.html
 - Các thẻ đầu vào đang sử dụng thuộc tính bắt buộc ở đây. Điều này yêu cầu trình duyệt không gửi biểu mẫu cho đến khi các trường đó được điền vào. Nếu người dùng đang sử dụng trình duyệt cũ hơn không hỗ trợ thuộc tính đó hoặc nếu họ đang sử dụng thứ gì đó ngoài trình duyệt để thực hiện yêu cầu, bạn vẫn muốn xác thực dữ liệu trong chế độ xem Bình. Điều quan trọng là phải luôn xác thực đầy đủ dữ liệu trên máy chủ, ngay cả khi máy khách cũng thực hiện một số xác thực.
-##### Trang đăng nhập
+<a name="logintemplate"></a>
+#### 5.3 Mẫu đăng nhập
+
 Tương tự như register.html
 ```flaskr/templates/auth/login.html```
 ```
@@ -568,9 +585,9 @@ Tương tự như register.html
 ```
 Đến đây hay thử chạy server và đăng kí một user.
 
-Note: Hãy lưu ý phần FLASK_APP nhé.
-
-#### Trang chủ
+Note: Hãy lưu ý phần ```FLASK_APP``` nhé.
+<a name="indextemplate"></a>
+#### 5.4 Mẫu trang chỉ mục
 
 Tiếp theo: Sau khi đăng nhập Flask sẽ trả về url_for('index'). Index này ta sẽ đặt trong blueprint 'blog', trước hết ta sẽ khai báo một blueprint là 'blog' với ứng dụng tương tự như khi khai báo blueprint 'auth' nhé.
 
@@ -647,7 +664,9 @@ def index():
 Một chút kiến thức với jinja sẽ giúp bạn hiểu về các vòng lặp trong đoạn code trên nhé.
 Chức năng trang chủ để hiển thị Post đã hoàn thành nhưng chúng ta chưa có bài viết nào để hiển thị cả, hãy xây dựng một form create post nhé.
 Trước hết là tạo form để tạo post. Trước hết hãy yêu cầu user đăng nhập để có thể sử dụng tính năng này(dùng login_required)
-#### Create
+<a name="createtemplate"></a>
+#### 5.5 Mẫu tạo bài đăng
+
 ```flaskr/blog.py```
 ```
 @bp.route('/create', methods=('GET', 'POST'))
@@ -693,7 +712,9 @@ def create():
   </form>
 {% endblock %}
 ```
-#### Update
+<a name="updatetemplate"></a>
+#### 5.6 Mẫu cập nhật
+
 Cả chế độ Update và delete sẽ cần tìm nạp một post theo id và kiểm tra xem tác giả có khớp với user đã đăng nhập hay không. Để tránh trùng lặp mã, bạn có thể viết một hàm để lấy post và gọi nó từ mỗi lần xem.
 ```flaskr/blog.py```
 ```
@@ -713,8 +734,8 @@ def get_post(id, check_author=True):
 
     return post
 ```
-- abort() sẽ đưa ra một ngoại lệ đặc biệt trả về mã trạng thái HTTP. Nó cần một thông báo tùy chọn để hiển thị cùng với lỗi, nếu không, một thông báo mặc định sẽ được sử dụng. 404 có nghĩa là "Not Found" và 403 có nghĩa là "Forbidden". (401 có nghĩa là “Unauthorized”, nhưng bạn chuyển hướng đến trang login thay vì trả lại trạng thái đó.)
-- check_author được định nghĩa để hàm có thể được sử dụng để lấy một post mà không cần kiểm tra tác giả. Điều này sẽ hữu ích nếu bạn viết một lượt xem để hiển thị từng post trên một trang, nơi người dùng không quan trọng vì họ không sửa đổi bài đăng.
+- ```abort()``` sẽ đưa ra một ngoại lệ đặc biệt trả về mã trạng thái HTTP. Nó cần một thông báo tùy chọn để hiển thị cùng với lỗi, nếu không, một thông báo mặc định sẽ được sử dụng. 404 có nghĩa là "Not Found" và 403 có nghĩa là "Forbidden". (401 có nghĩa là “Unauthorized”, nhưng bạn chuyển hướng đến trang login thay vì trả lại trạng thái đó.)
+- ```check_author``` được định nghĩa để hàm có thể được sử dụng để lấy một post mà không cần kiểm tra tác giả. Điều này sẽ hữu ích nếu bạn viết một lượt xem để hiển thị từng post trên một trang, nơi người dùng không quan trọng vì họ không sửa đổi bài đăng.
 ```flaskr/blog.py```
 ```
 @bp.route('/<int:id>/update', methods=('GET', 'POST'))
@@ -772,8 +793,10 @@ def update(id):
 ```
 - Template này có hai dạng. Đầu tiên đăng dữ liệu đã chỉnh sửa lên trang hiện tại(/<id>/update). Form khác chỉ chứa một nút và chỉ định một thuộc tính hành động sẽ đăng lên dạng xem xóa. Nút này sử dụng một số JavaScript để hiển thị hộp thoại xác nhận trước khi gửi.
 
-- Mẫu {{request.form['title'] hoặc post['title']}} được sử dụng để chọn dữ liệu xuất hiện trong form. Khi form chưa được gửi, dữ liệu post ban đầu sẽ xuất hiện, nhưng nếu dữ liệu post không hợp lệ đã được đăng, bạn muốn hiển thị dữ liệu đó để user có thể sửa lỗi, do đó, request.form sẽ được sử dụng thay thế. yêu cầu là một biến khác tự động có sẵn trong các templates.
-#### Delete
+- Template {{request.form['title'] hoặc post['title']}} được sử dụng để chọn dữ liệu xuất hiện trong form. Khi form chưa được gửi, dữ liệu post ban đầu sẽ xuất hiện, nhưng nếu dữ liệu post không hợp lệ đã được đăng, bạn muốn hiển thị dữ liệu đó để user có thể sửa lỗi, do đó, request.form sẽ được sử dụng thay thế. yêu cầu là một biến khác tự động có sẵn trong các templates.
+<a name="deletetemplate"></a>
+#### 5.7 Mẫu xóa
+    
 Chế độ xem delete không có tempalte riêng, nút xóa là một phần của update.html và đăng lên URL/ <id>/delete. Vì không có template, nó sẽ chỉ xử lý phương thức POST và sau đó chuyển hướng đến index.
 ```flaskr/blog.py```
 ```
@@ -786,7 +809,10 @@ def delete(id):
     db.commit()
     return redirect(url_for('blog.index'))
 ```
+<a name="updatetemplate"></a>
+#### 5.8 Nâng cấp giao diện
 Blog của bạn gần như đã hoàn thành tuy nhiên hãy để ý đến base.html có một đường dẫn đến file css. Hãy thêm style.css để cập nhật giao diện cho blog của mình.
+    
 ```style.css```
 ```
 html { font-family: sans-serif; background: #eee; padding: 1rem; }
@@ -818,4 +844,4 @@ input[type=submit] { align-self: start; min-width: 10em; }
 ```
 Hãy thử chạy Flask và thử các tính năng.
 
-Note: Hãy để ý đến (venv) và FLASK_APP.
+Note: Hãy để ý đến ```(venv)``` và ```FLASK_APP```.

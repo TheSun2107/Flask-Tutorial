@@ -3,8 +3,10 @@ Bài viết này được dịch dựa trên <a href="https://flask.palletsproje
 ### Mục lục
 
 [I. Mở đầu](#Modau)
-- [1. Lời giới thiệu](#Loigioithieu)
-- [2. Kiến thức cần chuẩn bị](#Kienthuccanchuanbi)
+
+[1. Lời giới thiệu](#Loigioithieu)
+
+[2. Kiến thức cần chuẩn bị](#Kienthuccanchuanbi)
 
 [II. Cài đặt](#Caidat)
 

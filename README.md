@@ -59,7 +59,7 @@ Bài viết này được dịch dựa trên <a href="https://flask.palletsproje
 - [2.3 Thử nghiệm xác thực](#authenicationtest)
 - [2.4 Thử nghiệm blog](#blogtest)
 
-[3. Chạy thử nghiệm](runtest)
+[3. Chạy thử nghiệm](#runtest)
 
 [VII. Xử lý lỗi](#Xulyloi)
 [VIII. Gỡ lỗi](#Goloi)
@@ -870,7 +870,7 @@ Hãy thử chạy Flask và thử các tính năng.
 Note: Hãy để ý đến ```(venv)``` và ```FLASK_APP```.
 
 <a name="projectinstallable"></a>
-V. Project Installable - Cài đặt dự án
+## V. Project Installable - Cài đặt dự án
 Dự án gần như đã hoàn thành, tuy nhiên đó là ở trên máy của chúng ta mà thôi, vậy muốn nó chạy được trên máy người khác thì phài làm sao?
 Chúng ta phải cài đặt lại từ đầu thì mất quá nhiều thời gian. Hãy tìm cách mô tả và cài đặt dự án để nó có thể cài đặt được ở mọi nơi.
 Với tutorial việc giới thiệu phần này là muộn. Với những dự án sau này, các bạn hãy bắt đầu nó từ khi bắt đầu dự án nhé.
@@ -902,8 +902,8 @@ graft flaskr/templates
 global-exclude *.pyc
 ```
 - Điều này yêu cầu Python sao chép mọi thứ trong thư mục static và templates cũng như tệp schema.sql, nhưng loại trừ tất cả các tệp bytecode.
-
-[2. Install - Cài đặt dự án]
+<a name="projectinstall">
+### 2. Install - Cài đặt dự án
 
 Hãy tìm cách upload project của bạn lên Github nhé.
 Bây giờ hãy clone project của bạn về một nơi khác:
@@ -937,16 +937,16 @@ Werkzeug     2.0.2
 ```flask run``` và kiểm tra nó. Đảm bảo rằng bạn đã khai báo FLASK_APP nhé.
 Vậy là bạn có thể sử dụng được project của mình ở nhiều nơi khác nhau rồi. Tuy nhiên vẫn còn nhiều công đoạn nữa để project có thể đến tay người dùng được.
 <a name="test"></a>
-VI. Test - Thử nghiệm
+## VI. Test - Thử nghiệm
 Viết các bài kiểm tra đơn vị cho ứng dụng của bạn cho phép bạn kiểm tra xem mã bạn đã viết có hoạt động theo cách bạn mong đợi hay không. Flask cung cấp một ứng dụng khách thử nghiệm mô phỏng các yêu cầu đến ứng dụng và trả về dữ liệu phản hồi.
 <a name="installtest"></a>
-1. Cài đặt thử nghiệm
+### 1. Cài đặt thử nghiệm
 
 (venv)$ Flask-Tutorial> pip install pytest coverage
 (venv)$ Flask-Tutorial> mkdir tests
 
 <a name="setuptest"></a>
-2. Thiết lập thử nghiệm
+### 2. Thiết lập thử nghiệm
 Mã kiểm tra nằm trong thư mục kiểm tra. Thư mục này nằm bên cạnh gói flaskr, không phải bên trong nó. Tệp tests / conftest.py chứa các chức năng thiết lập được gọi là đồ đạc mà mỗi thử nghiệm sẽ sử dụng. Kiểm tra trong các mô-đun Python bắt đầu bằng test_ và mỗi hàm kiểm tra trong các mô-đun đó cũng bắt đầu bằng test_.
 
 Mỗi bài kiểm tra sẽ tạo một tệp cơ sở dữ liệu tạm thời mới và điền một số dữ liệu sẽ được sử dụng trong các bài kiểm tra. Viết tệp SQL để chèn dữ liệu đó.
@@ -1016,7 +1016,7 @@ def runner(app):
 - Pytest sử dụng các đồ đạc bằng cách khớp tên hàm của chúng với tên của các đối số trong các hàm kiểm tra. Ví dụ: hàm test_hello mà bạn sẽ viết tiếp theo có một đối số khách hàng. Pytest đối sánh điều đó với hàm cố định máy khách, gọi nó và chuyển giá trị trả về cho hàm kiểm tra.
 
 <a name="factorytest"></a>
-2.1 Thử nghiệm nhà máy ứng dụng
+#### 2.1 Thử nghiệm nhà máy ứng dụng
 
 Không có nhiều điều để kiểm tra về chính nhà máy. Hầu hết mã sẽ được thực thi cho mỗi bài kiểm tra, vì vậy nếu có điều gì đó không thành công, các bài kiểm tra khác sẽ thông báo.
 
@@ -1037,7 +1037,7 @@ def test_hello(client):
     assert response.data == b'Hello, World!'
 ```
 <a name="databasetest"></a>
-2.2 Thử nghiệm cơ sở dữ liệu
+#### 2.2 Thử nghiệm cơ sở dữ liệu
 Trong ngữ cảnh ứng dụng, get_db sẽ trả về cùng một kết nối mỗi khi nó được gọi. Sau ngữ cảnh, kết nối sẽ được đóng lại.
 
 ```tests/test_db.py```
@@ -1074,7 +1074,7 @@ def test_init_db_command(runner, monkeypatch):
 - Thử nghiệm này sử dụng thiết bị cố định Monkeypatch của Pytest để thay thế hàm init_db bằng một hàm ghi lại rằng nó đã được gọi. Vật cố định người chạy mà bạn đã viết ở trên được sử dụng để gọi lệnh init-db theo tên.
 
 <a name="authenticationtest"></a>
-2.3 Thử nghiệm xác thực
+#### 2.3 Thử nghiệm xác thực
 Đối với hầu hết các chế độ xem, người dùng cần phải đăng nhập. Cách dễ nhất để thực hiện việc này trong các thử nghiệm là thực hiện yêu cầu ĐĂNG đối với chế độ xem đăng nhập với ứng dụng khách. Thay vì viết nó ra mọi lúc, bạn có thể viết một lớp với các phương thức để làm điều đó và sử dụng một vật cố định để chuyển nó cho máy khách cho mỗi lần kiểm tra.
 
 ```tesst/conftest.py```
@@ -1179,7 +1179,7 @@ def test_logout(client, auth):
 - Kiểm tra đăng xuất ngược lại với đăng nhập. phiên không được chứa user_id sau khi đăng xuất.
 
 <a name="blogtest"></a>
-2.4 Thử nghiệm blog
+#### 2.4 Thử nghiệm blog
 Tất cả các lượt xem blog đều sử dụng thiết bị xác thực mà bạn đã viết trước đó. Gọi auth.login () và các yêu cầu tiếp theo từ máy khách sẽ được đăng nhập với tư cách người dùng thử nghiệm.
 
 Chế độ xem chỉ mục sẽ hiển thị thông tin về bài đăng đã được thêm vào với dữ liệu thử nghiệm. Khi đăng nhập với tư cách tác giả, cần có một liên kết để chỉnh sửa bài viết.
@@ -1287,7 +1287,7 @@ def test_delete(client, auth, app):
 ```
 - Chế độ xem xóa sẽ chuyển hướng đến URL chỉ mục và bài đăng sẽ không còn tồn tại trong cơ sở dữ liệu.
 <a name="runtest"></a>
-3. Chạy thử nghiệm
+### 3. Chạy thử nghiệm
 
 ```(venv)$ Flask-Tutorial>pytest```
 Nếu nó không hoạt động hãy thử:

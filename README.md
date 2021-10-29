@@ -22,7 +22,7 @@ Bài viết này được dịch dựa trên <a href="https://flask.palletsproje
 - [2.1 Tạo ứng dụng](#createapp)
 - [2.2 Chạy ứng dụng](#runapp)
 
-[3. Sử dụng cơ sở dữ liệu](#usedatabase)
+[3. Database - cơ sở dữ liệu](#usedatabase)
 - [3.1 Kết nối cơ sở dữ liệu](#connectdatabase)
 - [3.2 Tạo bảng](#createtable)
 - [3.3 Đăng ký cơ sở dữ liệu với ứng dụng](#registerdatabase)
@@ -33,7 +33,7 @@ Bài viết này được dịch dựa trên <a href="https://flask.palletsproje
 - [4.2 Đăng nhập](#login)
 - [4.3 Xác thực](#authentication)
  
-[5. Templates](#templates)
+[5. Templates - Mẫu](#templates)
 - [5.1 Mẫu chung](#basetemplate)
 - [5.2 Mẫu trang đăng ký](#registertemplate)
 - [5.3 Mẫu trang đăng nhập](#logintemplate)
@@ -43,7 +43,24 @@ Bài viết này được dịch dựa trên <a href="https://flask.palletsproje
 - [5.7 Mẫu xóa](#deletetemplate)
 - [5.8 Nâng cấp giao diện](#updatetemplate)
 
-[VI. Thử nghiệm](#Thunghiem)
+[V. Project Installable - Cài đặt dự án](#projectinstallable)
+
+[1. Describe - Mô tả dự án](#projectdescribe)
+[2. Install - Cài đặt dự án](#projectinstall)
+
+[VI. Test - Thử nghiệm](#test)
+
+[1. Cài đặt thử nghiệm](#installtest)
+
+[2. Thiết lập thử nghiệm](#setuptest)
+
+- [2.1 Thử nghiệm nhà máy ứng dụng](#factorytest)
+- [2.2 Thử nghiệm cơ sở dữ liệu](#databasetest)
+- [2.3 Thử nghiệm xác thực](#authenicationtest)
+- [2.4 Thử nghiệm blog](#blogtest)
+
+[3. Chạy thử nghiệm](runtest)
+
 [VII. Xử lý lỗi](#Xulyloi)
 [VIII. Gỡ lỗi](#Goloi)
 [IX. Nhật ký](#Nhatky)
@@ -851,3 +868,94 @@ input[type=submit] { align-self: start; min-width: 10em; }
 Hãy thử chạy Flask và thử các tính năng.
 
 Note: Hãy để ý đến ```(venv)``` và ```FLASK_APP```.
+
+<a name="projectinstallable"></a>
+V. Project Installable - Cài đặt dự án
+Dự án gần như đã hoàn thành, tuy nhiên đó là ở trên máy của chúng ta mà thôi, vậy muốn nó chạy được trên máy người khác thì phài làm sao?
+Chúng ta phải cài đặt lại từ đầu thì mất quá nhiều thời gian. Hãy tìm cách mô tả và cài đặt dự án để nó có thể cài đặt được ở mọi nơi.
+Với tutorial việc giới thiệu phần này là muộn. Với những dự án sau này, các bạn hãy bắt đầu nó từ khi bắt đầu dự án nhé.
+Hãy xem lại cấu trúc của dự án nhé.
+[1. Describe - Mô tả dự án]
+
+```setup.py```
+```
+from setuptools import find_packages, setup
+
+setup(
+    name='flaskr',
+    version='1.0.0',
+    packages=find_packages(),
+    include_package_data=True,
+    zip_safe=False,
+    install_requires=[
+        'flask',
+    ],
+)
+```
+- Các gói cho Python biết những thư mục gói nào (và các tệp Python mà chúng chứa) cần bao gồm. find_packages () tự động tìm các thư mục này, do đó bạn không cần phải gõ chúng ra. Để bao gồm các tệp khác, chẳng hạn như thư mục tĩnh và mẫu, dữ liệu include_package_data được thiết lập. Python cần một tệp khác có tên MANIFEST.in để cho biết dữ liệu khác này là gì.
+
+```MANIFEST.in```
+```
+include flaskr/schema.sql
+graft flaskr/static
+graft flaskr/templates
+global-exclude *.pyc
+```
+- Điều này yêu cầu Python sao chép mọi thứ trong thư mục static và templates cũng như tệp schema.sql, nhưng loại trừ tất cả các tệp bytecode.
+
+[2. Install - Cài đặt dự án]
+
+Hãy tìm cách upload project của bạn lên Github nhé.
+Bây giờ hãy clone project của bạn về một nơi khác:
+
+```
+$ cd Flask-Tutorial
+$ Flask-Tutorial> cd venv/Scripts
+$ Flask-Tutorial\venv\Scripts> activate
+$ Flask-Tutorial> pip install -e .
+```
+- Điều này yêu cầu pip tìm setup.py trong thư mục hiện tại và cài đặt nó ở chế độ có thể chỉnh sửa hoặc phát triển. Chế độ có thể chỉnh sửa có nghĩa là khi bạn thực hiện các thay đổi đối với mã cục bộ của mình, bạn sẽ chỉ cần cài đặt lại nếu bạn thay đổi siêu dữ liệu về dự án, chẳng hạn như các phụ thuộc của dự án.
+
+Hãy kiểm tra và so sánh với project trên máy:
+```
+$ Flask-Tutorial>pip list
+```
+```
+Package      Version Location
+------------ ------- -----------------------------------------
+click        8.0.3
+colorama     0.4.4
+Flask        2.0.2
+flaskr       1.0.0   c:\users\admin\flask-clone\flask-tutorial
+itsdangerous 2.0.1
+Jinja2       3.0.2
+MarkupSafe   2.0.1
+pip          21.2.3
+setuptools   57.4.0
+Werkzeug     2.0.2
+```
+```flask run``` và kiểm tra nó. Đảm bảo rằng bạn đã khai báo FLASK_APP nhé.
+Vậy là bạn có thể sử dụng được project của mình ở nhiều nơi khác nhau rồi. Tuy nhiên vẫn còn nhiều công đoạn nữa để project có thể đến tay người dùng được.
+<a name="test"></a>
+VI. Test - Thử nghiệm
+Viết các bài kiểm tra đơn vị cho ứng dụng của bạn cho phép bạn kiểm tra xem mã bạn đã viết có hoạt động theo cách bạn mong đợi hay không. Flask cung cấp một ứng dụng khách thử nghiệm mô phỏng các yêu cầu đến ứng dụng và trả về dữ liệu phản hồi.
+<a name="installtest"></a>
+1. Cài đặt thử nghiệm
+
+<a name="setuptest"></a>
+2. Thiết lập thử nghiệm
+
+<a name="factorytest"></a>
+2.1 Thử nghiệm nhà máy ứng dụng
+
+<a name="databasetest"></a>
+2.2 Thử nghiệm cơ sở dữ liệu
+
+<a name="authenticationtest"></a>
+2.3 Thử nghiệm xác thực
+
+<a name="blogtest"></a>
+2.4 Thử nghiệm blog
+
+<a name="runtest"></a>
+3. Chạy thử nghiệm

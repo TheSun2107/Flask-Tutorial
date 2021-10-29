@@ -942,20 +942,389 @@ Viết các bài kiểm tra đơn vị cho ứng dụng của bạn cho phép b�
 <a name="installtest"></a>
 1. Cài đặt thử nghiệm
 
+(venv)$ Flask-Tutorial> pip install pytest coverage
+(venv)$ Flask-Tutorial> mkdir tests
+
 <a name="setuptest"></a>
 2. Thiết lập thử nghiệm
+Mã kiểm tra nằm trong thư mục kiểm tra. Thư mục này nằm bên cạnh gói flaskr, không phải bên trong nó. Tệp tests / conftest.py chứa các chức năng thiết lập được gọi là đồ đạc mà mỗi thử nghiệm sẽ sử dụng. Kiểm tra trong các mô-đun Python bắt đầu bằng test_ và mỗi hàm kiểm tra trong các mô-đun đó cũng bắt đầu bằng test_.
+
+Mỗi bài kiểm tra sẽ tạo một tệp cơ sở dữ liệu tạm thời mới và điền một số dữ liệu sẽ được sử dụng trong các bài kiểm tra. Viết tệp SQL để chèn dữ liệu đó.
+
+```tests/data.sql```
+```
+INSERT INTO user (username, password)
+VALUES
+  ('test', 'pbkdf2:sha256:50000$TCI4GzcX$0de171a4f4dac32e3364c7ddc7c14f3e2fa61f2d17574483f7ffbb431b4acb2f'),
+  ('other', 'pbkdf2:sha256:50000$kJPKsz6N$d2d4784f1b030a9761f5ccaeeaca413f27f2ecb76d6168407af962ddce849f79');
+
+INSERT INTO post (title, body, author_id, created)
+VALUES
+  ('test title', 'test' || x'0a' || 'body', 1, '2018-01-01 00:00:00');
+```
+Ứng dụng cố định sẽ gọi nhà máy và vượt qua test_config để định cấu hình ứng dụng và cơ sở dữ liệu để thử nghiệm thay vì sử dụng cấu hình phát triển cục bộ của bạn.
+
+```tests/conftest.py```
+```
+import os
+import tempfile
+
+import pytest
+from flaskr import create_app
+from flaskr.db import get_db, init_db
+
+with open(os.path.join(os.path.dirname(__file__), 'data.sql'), 'rb') as f:
+    _data_sql = f.read().decode('utf8')
+
+
+@pytest.fixture
+def app():
+    db_fd, db_path = tempfile.mkstemp()
+
+    app = create_app({
+        'TESTING': True,
+        'DATABASE': db_path,
+    })
+
+    with app.app_context():
+        init_db()
+        get_db().executescript(_data_sql)
+
+    yield app
+
+    os.close(db_fd)
+    os.unlink(db_path)
+
+
+@pytest.fixture
+def client(app):
+    return app.test_client()
+
+
+@pytest.fixture
+def runner(app):
+    return app.test_cli_runner()
+```
+- ```tempfile.mkstemp()``` tạo và mở một tệp tạm thời, trả về bộ mô tả tệp và đường dẫn đến tệp đó. Đường dẫn DATABASE bị ghi đè nên nó trỏ đến đường dẫn tạm thời này thay vì thư mục cá thể. Sau khi thiết lập đường dẫn, các bảng cơ sở dữ liệu được tạo và dữ liệu thử nghiệm được chèn vào. Sau khi thử nghiệm kết thúc, tệp tạm thời được đóng và xóa.
+
+- TESTING cho Flask biết rằng ứng dụng đang ở chế độ thử nghiệm. Flask thay đổi một số hành vi bên trong để dễ kiểm tra hơn và các tiện ích mở rộng khác cũng có thể sử dụng cờ để kiểm tra chúng dễ dàng hơn.
+
+- Ứng dụng khách gọi app.test_client() với đối tượng ứng dụng được tạo bởi ứng dụng fixture. Các thử nghiệm sẽ sử dụng máy khách để thực hiện các yêu cầu đối với ứng dụng mà không cần chạy máy chủ.
+
+- Vật cố định người chạy tương tự như khách hàng. app.test_cli_runner() tạo một trình chạy có thể gọi các lệnh Click đã đăng ký với ứng dụng.
+
+- Pytest sử dụng các đồ đạc bằng cách khớp tên hàm của chúng với tên của các đối số trong các hàm kiểm tra. Ví dụ: hàm test_hello mà bạn sẽ viết tiếp theo có một đối số khách hàng. Pytest đối sánh điều đó với hàm cố định máy khách, gọi nó và chuyển giá trị trả về cho hàm kiểm tra.
 
 <a name="factorytest"></a>
 2.1 Thử nghiệm nhà máy ứng dụng
 
+Không có nhiều điều để kiểm tra về chính nhà máy. Hầu hết mã sẽ được thực thi cho mỗi bài kiểm tra, vì vậy nếu có điều gì đó không thành công, các bài kiểm tra khác sẽ thông báo.
+
+Hành vi duy nhất có thể thay đổi là vượt qua cấu hình kiểm tra. Nếu cấu hình không được thông qua, phải có một số cấu hình mặc định, nếu không cấu hình sẽ được ghi đè.
+
+```tests/test_factory.py```
+```
+from flaskr import create_app
+
+
+def test_config():
+    assert not create_app().testing
+    assert create_app({'TESTING': True}).testing
+
+
+def test_hello(client):
+    response = client.get('/hello')
+    assert response.data == b'Hello, World!'
+```
 <a name="databasetest"></a>
 2.2 Thử nghiệm cơ sở dữ liệu
+Trong ngữ cảnh ứng dụng, get_db sẽ trả về cùng một kết nối mỗi khi nó được gọi. Sau ngữ cảnh, kết nối sẽ được đóng lại.
+
+```tests/test_db.py```
+```
+import sqlite3
+
+import pytest
+from flaskr.db import get_db
+
+
+def test_get_close_db(app):
+    with app.app_context():
+        db = get_db()
+        assert db is get_db()
+
+    with pytest.raises(sqlite3.ProgrammingError) as e:
+        db.execute('SELECT 1')
+
+    assert 'closed' in str(e.value)
+
+def test_init_db_command(runner, monkeypatch):
+    class Recorder(object):
+        called = False
+
+    def fake_init_db():
+        Recorder.called = True
+
+    monkeypatch.setattr('flaskr.db.init_db', fake_init_db)
+    result = runner.invoke(args=['init-db'])
+    assert 'Initialized' in result.output
+    assert Recorder.called
+```
+- Lệnh init-db sẽ gọi hàm init_db và xuất ra một thông báo.
+- Thử nghiệm này sử dụng thiết bị cố định Monkeypatch của Pytest để thay thế hàm init_db bằng một hàm ghi lại rằng nó đã được gọi. Vật cố định người chạy mà bạn đã viết ở trên được sử dụng để gọi lệnh init-db theo tên.
 
 <a name="authenticationtest"></a>
 2.3 Thử nghiệm xác thực
+Đối với hầu hết các chế độ xem, người dùng cần phải đăng nhập. Cách dễ nhất để thực hiện việc này trong các thử nghiệm là thực hiện yêu cầu ĐĂNG đối với chế độ xem đăng nhập với ứng dụng khách. Thay vì viết nó ra mọi lúc, bạn có thể viết một lớp với các phương thức để làm điều đó và sử dụng một vật cố định để chuyển nó cho máy khách cho mỗi lần kiểm tra.
+
+```tesst/conftest.py```
+```
+class AuthActions(object):
+    def __init__(self, client):
+        self._client = client
+
+    def login(self, username='test', password='test'):
+        return self._client.post(
+            '/auth/login',
+            data={'username': username, 'password': password}
+        )
+
+    def logout(self):
+        return self._client.get('/auth/logout')
+
+
+@pytest.fixture
+def auth(client):
+    return AuthActions(client)
+```
+- 361 / 5000
+Kết quả dịch
+Với phần cố định auth, bạn có thể gọi auth.login () trong thử nghiệm để đăng nhập với tư cách là người dùng thử nghiệm, được chèn vào như một phần của dữ liệu thử nghiệm trong ứng dụng cố định.
+
+Chế độ xem đăng ký sẽ hiển thị thành công trên GET. Trên POST với dữ liệu biểu mẫu hợp lệ, nó sẽ chuyển hướng đến URL đăng nhập và dữ liệu của người dùng phải có trong cơ sở dữ liệu. Dữ liệu không hợp lệ nên hiển thị thông báo lỗi. 
+
+```tests/test_auth.py```
+```
+import pytest
+from flask import g, session
+from flaskr.db import get_db
+
+
+def test_register(client, app):
+    assert client.get('/auth/register').status_code == 200
+    response = client.post(
+        '/auth/register', data={'username': 'a', 'password': 'a'}
+    )
+    assert 'http://localhost/auth/login' == response.headers['Location']
+
+    with app.app_context():
+        assert get_db().execute(
+            "SELECT * FROM user WHERE username = 'a'",
+        ).fetchone() is not None
+
+
+@pytest.mark.parametrize(('username', 'password', 'message'), (
+    ('', '', b'Username is required.'),
+    ('a', '', b'Password is required.'),
+    ('test', 'test', b'already registered'),
+))
+def test_register_validate_input(client, username, password, message):
+    response = client.post(
+        '/auth/register',
+        data={'username': username, 'password': password}
+    )
+    assert message in response.data
+```
+- client.get () thực hiện yêu cầu GET và trả về đối tượng Phản hồi do Flask trả về. Tương tự, client.post () thực hiện một yêu cầu ĐĂNG, chuyển đổi dữ liệu dict thành dữ liệu biểu mẫu.
+
+- Để kiểm tra xem trang có hiển thị thành công hay không, một yêu cầu đơn giản được đưa ra và kiểm tra mã trạng thái 200 OK. Nếu hiển thị không thành công, Flask sẽ trả về mã lỗi 500 Internal Server Error.
+
+- tiêu đề sẽ có tiêu đề Vị trí với URL đăng nhập khi chế độ xem đăng ký chuyển hướng đến chế độ xem đăng nhập.
+
+- dữ liệu chứa phần thân của phản hồi dưới dạng byte. Nếu bạn mong đợi một giá trị nhất định hiển thị trên trang, hãy kiểm tra xem giá trị đó có trong dữ liệu hay không. Các byte phải được so sánh với các byte. Nếu bạn muốn so sánh văn bản, hãy sử dụng get_data (as_text = True) để thay thế.
+
+- pytest.mark.parametrize yêu cầu Pytest chạy cùng một hàm kiểm tra với các đối số khác nhau. Bạn sử dụng nó ở đây để kiểm tra các thông báo lỗi và đầu vào không hợp lệ khác nhau mà không cần viết cùng một mã ba lần.
+
+- Các bài kiểm tra cho chế độ xem đăng nhập rất giống với các bài kiểm tra cho chế độ đăng ký. Thay vì kiểm tra dữ liệu trong cơ sở dữ liệu, phiên phải được đặt user_id sau khi đăng nhập.
+```test/test_auth.py```
+```
+def test_login(client, auth):
+    assert client.get('/auth/login').status_code == 200
+    response = auth.login()
+    assert response.headers['Location'] == 'http://localhost/'
+
+    with client:
+        client.get('/')
+        assert session['user_id'] == 1
+        assert g.user['username'] == 'test'
+
+
+@pytest.mark.parametrize(('username', 'password', 'message'), (
+    ('a', 'test', b'Incorrect username.'),
+    ('test', 'a', b'Incorrect password.'),
+))
+def test_login_validate_input(auth, username, password, message):
+    response = auth.login(username, password)
+    assert message in response.data
+
+def test_logout(client, auth):
+    auth.login()
+
+    with client:
+        auth.logout()
+        assert 'user_id' not in session
+```
+- Sử dụng máy khách trong một khối với cho phép truy cập các biến ngữ cảnh như phiên sau khi phản hồi được trả về. Thông thường, việc truy cập phiên bên ngoài một yêu cầu sẽ gây ra lỗi.
+
+- Kiểm tra đăng xuất ngược lại với đăng nhập. phiên không được chứa user_id sau khi đăng xuất.
 
 <a name="blogtest"></a>
 2.4 Thử nghiệm blog
+Tất cả các lượt xem blog đều sử dụng thiết bị xác thực mà bạn đã viết trước đó. Gọi auth.login () và các yêu cầu tiếp theo từ máy khách sẽ được đăng nhập với tư cách người dùng thử nghiệm.
 
+Chế độ xem chỉ mục sẽ hiển thị thông tin về bài đăng đã được thêm vào với dữ liệu thử nghiệm. Khi đăng nhập với tư cách tác giả, cần có một liên kết để chỉnh sửa bài viết.
+
+Bạn cũng có thể kiểm tra thêm một số hành vi xác thực trong khi kiểm tra chế độ xem chỉ mục. Khi chưa đăng nhập, mỗi trang sẽ hiển thị các liên kết để đăng nhập hoặc đăng ký. Khi đăng nhập, có một liên kết để đăng xuất.
+```tests/test_blog.py```
+```
+import pytest
+from flaskr.db import get_db
+
+
+def test_index(client, auth):
+    response = client.get('/')
+    assert b"Log In" in response.data
+    assert b"Register" in response.data
+
+    auth.login()
+    response = client.get('/')
+    assert b'Log Out' in response.data
+    assert b'test title' in response.data
+    assert b'by test on 2018-01-01' in response.data
+    assert b'test\nbody' in response.data
+    assert b'href="/1/update"' in response.data
+```
+- Người dùng phải đăng nhập để truy cập vào chế độ xem tạo, cập nhật và xóa. Người dùng đã đăng nhập phải là tác giả của bài đăng để truy cập cập nhật và xóa, nếu không trạng thái 403 Forbidden sẽ bị trả về. Nếu bài đăng với id đã cho không tồn tại, cập nhật và xóa sẽ trả về 404 Not Found.
+```tests/test_blog.py```
+```
+@pytest.mark.parametrize('path', (
+    '/create',
+    '/1/update',
+    '/1/delete',
+))
+def test_login_required(client, path):
+    response = client.post(path)
+    assert response.headers['Location'] == 'http://localhost/auth/login'
+
+
+def test_author_required(app, client, auth):
+    # change the post author to another user
+    with app.app_context():
+        db = get_db()
+        db.execute('UPDATE post SET author_id = 2 WHERE id = 1')
+        db.commit()
+
+    auth.login()
+    # current user can't modify other user's post
+    assert client.post('/1/update').status_code == 403
+    assert client.post('/1/delete').status_code == 403
+    # current user doesn't see edit link
+    assert b'href="/1/update"' not in client.get('/').data
+
+
+@pytest.mark.parametrize('path', (
+    '/2/update',
+    '/2/delete',
+))
+def test_exists_required(client, auth, path):
+    auth.login()
+    assert client.post(path).status_code == 404
+```
+- Chế độ xem tạo và cập nhật sẽ hiển thị và trả về trạng thái 200 OK cho một yêu cầu GET. Khi dữ liệu hợp lệ được gửi trong một yêu cầu ĐĂNG, tạo sẽ chèn dữ liệu bài đăng mới vào cơ sở dữ liệu và cập nhật sẽ sửa đổi dữ liệu hiện có. Cả hai trang sẽ hiển thị thông báo lỗi trên dữ liệu không hợp lệ.
+
+```tests/test_blog.py```
+```
+def test_create(client, auth, app):
+    auth.login()
+    assert client.get('/create').status_code == 200
+    client.post('/create', data={'title': 'created', 'body': ''})
+
+    with app.app_context():
+        db = get_db()
+        count = db.execute('SELECT COUNT(id) FROM post').fetchone()[0]
+        assert count == 2
+
+
+def test_update(client, auth, app):
+    auth.login()
+    assert client.get('/1/update').status_code == 200
+    client.post('/1/update', data={'title': 'updated', 'body': ''})
+
+    with app.app_context():
+        db = get_db()
+        post = db.execute('SELECT * FROM post WHERE id = 1').fetchone()
+        assert post['title'] == 'updated'
+
+
+@pytest.mark.parametrize('path', (
+    '/create',
+    '/1/update',
+))
+def test_create_update_validate(client, auth, path):
+    auth.login()
+    response = client.post(path, data={'title': '', 'body': ''})
+    assert b'Title is required.' in response.data
+
+def test_delete(client, auth, app):
+    auth.login()
+    response = client.post('/1/delete')
+    assert response.headers['Location'] == 'http://localhost/'
+
+    with app.app_context():
+        db = get_db()
+        post = db.execute('SELECT * FROM post WHERE id = 1').fetchone()
+        assert post is None
+```
+- Chế độ xem xóa sẽ chuyển hướng đến URL chỉ mục và bài đăng sẽ không còn tồn tại trong cơ sở dữ liệu.
 <a name="runtest"></a>
 3. Chạy thử nghiệm
+
+```(venv)$ Flask-Tutorial>pytest```
+Nếu nó không hoạt động hãy thử:
+
+```(venv)$ Flask-Tutorial>converage run -m pytest```
+Bạn sẽ thấy một gì đó tương tự tại terminal
+```
+collected 24 items                                                                                    
+
+tests\test_auth.py ........                                                                    [ 33%] 
+tests\test_blog.py ............                                                                [ 83%] 
+tests\test_db.py ..                                                                            [ 91%] 
+tests\test_factory.py ..                                                                       [100%] 
+
+======================================== 24 passed in 8.88s ========================================= 
+======================================== test session starts ======================================== 
+platform win32 -- Python 3.9.7, pytest-6.2.5, py-1.10.0, pluggy-1.0.0
+```
+Kiểm tra lại coverage report tại terminal:
+
+```(venv)$Flask-Tutorial> coverage report```
+
+```
+(venv) PS C:\Users\Admin\Flask-Tutorial> coverage report
+Name                    Stmts   Miss  Cover
+flaskr\__init__.py         23      0   100%
+flaskr\auth.py             60      0   100%
+flaskr\blog.py             58      0   100%
+flaskr\db.py               25      0   100%
+tests\conftest.py          33      0   100%
+tests\test_auth.py         30      0   100%
+tests\test_blog.py         59      0   100%
+tests\test_db.py           19      0   100%
+tests\test_factory.py       7      0   100%
+-------------------------------------------
+TOTAL                     314      0   100%
+```
+Báo cáo HTML cho phép bạn xem dòng nào được bao gồm trong mỗi tệp:
+```(venv)$ Flask-Tutorial>coverage html```
+- Điều này tạo ra các tệp trong thư mục htmlcov. Mở htmlcov / index.html trong trình duyệt của bạn để xem báo cáo.

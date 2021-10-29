@@ -941,10 +941,10 @@ Vậy là bạn có thể sử dụng được project của mình ở nhiều n
 Viết các bài kiểm tra đơn vị cho ứng dụng của bạn cho phép bạn kiểm tra xem mã bạn đã viết có hoạt động theo cách bạn mong đợi hay không. Flask cung cấp một ứng dụng khách thử nghiệm mô phỏng các yêu cầu đến ứng dụng và trả về dữ liệu phản hồi.
 <a name="installtest"></a>
 ### 1. Cài đặt thử nghiệm
-
+```
 (venv)$ Flask-Tutorial> pip install pytest coverage
 (venv)$ Flask-Tutorial> mkdir tests
-
+```
 <a name="setuptest"></a>
 ### 2. Thiết lập thử nghiệm
 Mã kiểm tra nằm trong thư mục kiểm tra. Thư mục này nằm bên cạnh gói flaskr, không phải bên trong nó. Tệp tests / conftest.py chứa các chức năng thiết lập được gọi là đồ đạc mà mỗi thử nghiệm sẽ sử dụng. Kiểm tra trong các mô-đun Python bắt đầu bằng test_ và mỗi hàm kiểm tra trong các mô-đun đó cũng bắt đầu bằng test_.
